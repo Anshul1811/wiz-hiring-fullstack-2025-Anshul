@@ -29,8 +29,28 @@ export const login = async (req, res) => {
       expiresIn: '1d',
     });
 
-    return res.json({ message: 'Login successful', token });
+    // Set cookie with token, secure & httpOnly
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // only https in prod
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      path: '/', // cookie valid for entire site
+    });
+
+    return res.json({ message: 'Login successful' });
   } catch (err) {
     return res.status(500).json({ message: 'Login failed', error: err.message });
   }
+};
+
+
+export const logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+  });
+  res.json({ message: 'Logged out' });
 };
