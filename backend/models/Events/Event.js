@@ -7,6 +7,10 @@ export default (sequelize, DataTypes) => {
       },
       title: DataTypes.STRING,
       description: DataTypes.TEXT,
+      image: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },      
     });
   
     Event.associate = models => {

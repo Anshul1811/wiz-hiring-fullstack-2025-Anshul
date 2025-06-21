@@ -3,7 +3,7 @@ import db from '../models/index.js';
 export const createEvent = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { title, description, slots } = req.body;
+    const { title, description, slots, image } = req.body;
 
     if (!title || !slots || !Array.isArray(slots) || slots.length === 0) {
       return res.status(400).json({ message: 'Title and slots are required' });
@@ -21,6 +21,7 @@ export const createEvent = async (req, res) => {
       title,
       description,
       user_id: userId,
+      image,
     });
 
     const createdSlots = await Promise.all(
@@ -33,7 +34,7 @@ export const createEvent = async (req, res) => {
       )
     );
 
-    return res.status(201).json({ message: 'Event created', event, slots: createdSlots });
+    return res.status(200).json({ message: 'Event created', event, slots: createdSlots });
   } catch (error) {
     console.error('Create event error:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
@@ -44,7 +45,7 @@ export const createEvent = async (req, res) => {
 export const getAllEvents = async (req, res) => {
     try {
       const events = await db.Event.findAll({
-        attributes: ['id', 'title', 'description', 'createdAt'],
+        attributes: ['id', 'title', 'image', 'description', 'createdAt'],
         include: [
           {
             model: db.User,
@@ -61,6 +62,7 @@ export const getAllEvents = async (req, res) => {
         id: event.id,
         title: event.title,
         description: event.description,
+        image: event.image,
         createdAt: event.createdAt,
         createdBy: event.User,
         totalSlots: event.Slots ? event.Slots.length : 0,
@@ -79,7 +81,7 @@ export const getEventById = async (req, res) => {
       const { id } = req.params;
   
       const event = await db.Event.findByPk(id, {
-        attributes: ['id', 'title', 'description', 'createdAt'],
+        attributes: ['id', 'title', 'image', 'description', 'createdAt'],
         include: [
           {
             model: db.User,
@@ -100,6 +102,7 @@ export const getEventById = async (req, res) => {
         id: event.id,
         title: event.title,
         description: event.description,
+        image: event.image,
         createdAt: event.createdAt,
         createdBy: event.User,
         slots: event.Slots || [], // or .timeSlots if you've aliased it
@@ -109,4 +112,3 @@ export const getEventById = async (req, res) => {
       return res.status(500).json({ message: 'Server error', error: error.message });
     }
   };
-  
