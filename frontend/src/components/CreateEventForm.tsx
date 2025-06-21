@@ -4,6 +4,7 @@ import { useState } from 'react';
 import api from '@/lib/api'; 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 export default function CreateEventForm() {
   const [title, setTitle] = useState('');
@@ -58,14 +59,22 @@ export default function CreateEventForm() {
     setIsSubmitting(true);
     try {
       await api.post('/events', { title, description, slots, image: imageUrl });
+      toast.success('Event created successfully!');
       router.push('/');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create event', err);
+  
+      // Show toast error with message from server if available
+      if (err.response?.data?.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error('Failed to create event. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Top Navigation Bar */}
