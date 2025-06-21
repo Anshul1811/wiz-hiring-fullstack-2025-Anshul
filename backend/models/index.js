@@ -1,5 +1,9 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 import dotenv from 'dotenv';
+import UserModel from './User/User.js';
+import EventModel from './Events/Event.js';
+import TimeSlotModel from './Slots/Slot.js';
+import BookingModel from './Booking/Booking.js';
 
 dotenv.config();
 
@@ -15,4 +19,22 @@ const sequelize = new Sequelize(
   }
 );
 
-export default sequelize;
+// Initialize models
+const models = {};
+
+models.User = UserModel(sequelize, DataTypes);
+models.Event = EventModel(sequelize, DataTypes);
+models.TimeSlot = TimeSlotModel(sequelize, DataTypes);
+models.Booking = BookingModel(sequelize, DataTypes);
+
+// Apply associations
+Object.values(models).forEach(model => {
+  if (model.associate) {
+    model.associate(models);
+  }
+});
+
+models.sequelize = sequelize;
+models.Sequelize = Sequelize;
+
+export default models;
