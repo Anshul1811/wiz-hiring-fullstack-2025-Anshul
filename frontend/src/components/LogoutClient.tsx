@@ -8,7 +8,7 @@ export default function LogoutClient() {
 
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout'); // This clears the cookie on backend
+      await api.post('/auth/logout');
       router.push('/login');
     } catch (err) {
       console.error('Logout failed:', err);
