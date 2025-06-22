@@ -5,15 +5,19 @@ export const createEvent = async (req, res) => {
     const userId = req.user.userId;
     const { title, description, slots, image } = req.body;
 
-    if (!title || !slots || !Array.isArray(slots) || slots.length === 0) {
-      return res.status(400).json({ message: 'Title and slots are required' });
+    if (!title || !Array.isArray(slots) || slots.length === 0) {
+      return res.status(400).json({ message: 'Title and at least one slot are required.' });
     }
 
     for (const slot of slots) {
-      if (!slot.start_time || typeof slot.max_bookings !== 'number' || slot.max_bookings < 1) {
-        return res.status(400).json({
-          message: 'Each slot must have a valid start_time and a max_bookings > 0',
-        });
+      if (!slot.start_time || isNaN(new Date(slot.start_time))) {
+        return res.status(400).json({ message: 'Each slot must have a valid start_time.' });
+      }
+      if (new Date(slot.start_time) <= new Date()) {
+        return res.status(400).json({ message: 'Slot start time must be in the future.' });
+      }
+      if (typeof slot.max_bookings !== 'number' || slot.max_bookings < 1) {
+        return res.status(400).json({ message: 'Each slot must have max_bookings greater than 0.' });
       }
     }
 
@@ -24,20 +28,27 @@ export const createEvent = async (req, res) => {
       image,
     });
 
-    const createdSlots = await Promise.all(
-      slots.map((slot) =>
-        db.TimeSlot.create({
-          event_id: event.id,
-          start_time: slot.start_time,
-          max_bookings: slot.max_bookings,
-        })
-      )
-    );
+    const createdSlots = [];
+    for (const slot of slots) {
+      const createdSlot = await db.TimeSlot.create({
+        event_id: event.id,
+        start_time: slot.start_time,
+        max_bookings: slot.max_bookings,
+      });
+      createdSlots.push(createdSlot);
+    }
 
-    return res.status(200).json({ message: 'Event created', event, slots: createdSlots });
+    return res.status(201).json({
+      message: 'Event created successfully',
+      event,
+      slots: createdSlots,
+    });
   } catch (error) {
     console.error('Create event error:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(500).json({
+      message: 'Server error',
+      error: error.message || error.toString(),
+    });
   }
 };
 
@@ -89,7 +100,7 @@ export const getEventById = async (req, res) => {
           },
           {
             model: db.TimeSlot,
-            attributes: ['id', 'start_time', 'max_bookings'], // removed 'current_bookings'
+            attributes: ['id', 'start_time', 'max_bookings'],
           },
         ],
       });
@@ -105,10 +116,10 @@ export const getEventById = async (req, res) => {
         image: event.image,
         createdAt: event.createdAt,
         createdBy: event.User,
-        slots: event.Slots || [], // or .timeSlots if you've aliased it
+        slots: event.Slots || [],
       });
     } catch (error) {
       console.error('Fetch event error:', error);
       return res.status(500).json({ message: 'Server error', error: error.message });
     }
-  };
+};

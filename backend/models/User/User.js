@@ -37,7 +37,7 @@ export default (sequelize, DataTypes) => {
     return await bcrypt.compare(plainPassword, this.password);
   };
 
-  // Associations (optional here)
+  // Associations
   User.associate = (models) => {
     User.hasMany(models.Event, { foreignKey: 'user_id' });
   };

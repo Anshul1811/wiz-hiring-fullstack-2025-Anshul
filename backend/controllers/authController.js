@@ -1,5 +1,7 @@
 import db from '../models/index.js';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const User = db.User;
 
@@ -34,10 +36,10 @@ export const login = async (req, res) => {
     // Set cookie with token, secure & httpOnly
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // only https in prod
+      secure: process.env.NODE_ENV === 'production', 
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      path: '/', // cookie valid for entire site
+      path: '/',
     });
 
     return res.json({ message: 'Login successful' });
