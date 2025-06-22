@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import EventDetails from '../../../components/EventDetails';
 
-export default async function EventDetailsPage({ params }: { params: { id: string } }) {
+export default async function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
@@ -10,7 +10,7 @@ export default async function EventDetailsPage({ params }: { params: { id: strin
     redirect('/login');
   }
 
-  const { id } =  await params; 
+  const { id } = await params; 
 
   return <EventDetails eventId={id} />;
 }

@@ -64,6 +64,15 @@ export default function Dashboard({ token }: { token: string }) {
               >
                 Create Event
               </Link>
+
+              <Link 
+                href="/bookings" 
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-sm"
+              >
+                My Bookings
+              </Link>
+
+              
               <LogoutClient />
             </div>
           </div>

@@ -9,7 +9,6 @@ export default async function DashboardPage() {
 
   // Check token presence and validity
   if (!token || !verifyToken(token)) {
-    console.log("Entereddddddddddd")
     redirect('/login');
   }
 

@@ -6,18 +6,27 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
+type Slot = {
+  start_time: string;
+  max_bookings: number;
+};
+
 export default function CreateEventForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [slots, setSlots] = useState([{ start_time: '', max_bookings: 1 }]);
+  const [slots, setSlots] = useState<Slot[]>([{ start_time: '', max_bookings: 1 }]);
   const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const handleSlotChange = (index: number, field: string, value: string | number) => {
+  const handleSlotChange = (index: number, field: keyof Slot, value: string | number) => {
     const updated = [...slots];
-    updated[index][field] = value;
+    if (field === 'start_time') {
+      updated[index][field] = value as string;
+    } else {
+      updated[index][field] = value as number;
+    }    
     setSlots(updated);
   };
 
