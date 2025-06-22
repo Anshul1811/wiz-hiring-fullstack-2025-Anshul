@@ -39,6 +39,7 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === 'production', 
       sameSite: 'None',
       maxAge: 24 * 60 * 60 * 1000, // 1 day
+      domain: undefined, // or just omit this line
       path: '/',
     });
 
