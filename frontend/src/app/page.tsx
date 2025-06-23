@@ -1,20 +1,20 @@
-export const dynamic = 'force-dynamic';
+'use client';
 
-
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { verifyToken } from '@/lib/auth';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Dashboard from '../components/Dashboard';
 
-export default async function DashboardPage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value; 
+export default function DashboardPage() {
+  const router = useRouter();
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-  // Check token presence and validity
-  if (!token || !verifyToken(token)) {
-     console.log(token, 'This is the token receoved');
-    redirect('/login');
-  }
+  useEffect(() => {
+    if (!token) {
+      router.push('/login');
+    }
+  }, [token]);
+
+  if (!token) return null; 
 
   return <Dashboard token={token} />;
 }
