@@ -8,7 +8,7 @@ import Dashboard from '../components/Dashboard';
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
+  const token = cookieStore.get('token')?.value || localStorage.getItem('token'); 
 
   // Check token presence and validity
   if (!token || !verifyToken(token)) {
